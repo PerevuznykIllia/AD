@@ -19,40 +19,43 @@ class SetData(server.App):
         {
             "type": 'dropdown',
             "label": 'Region',
-            "options": [{"label": "Vinnytsya", "value": "Вінницька"},
-                        {"label": "Volyn", "value": "Волинська"},
-                        {"label": "Dnipropetrovs'k", "value": "Дніпропетровська"},
-                        {"label": "Donets'k", "value": "Донецька"},
-                        {"label": "Zhytomyr", "value": "Житомирська"},
-                        {"label": "Transcarpathia", "value": "Закарпатська"},
-                        {"label": "Zaporizhzhya", "value": "Запорізька"},
-                        {"label": "Ivano-Frankivs'k", "value": "Івано-Франківська"},
-                        {"label": "Kiev", "value": "Київська"},
-                        {"label": "Kirovohrad", "value": "Кіровоградська"},
-                        {"label": "Luhans'k", "value": "Луганська"},
-                        {"label": "L'viv", "value": "Львівська"},
-                        {"label": "Mykolayiv", "value": "Миколаївська"},
-                        {"label": "Odessa", "value": "Одеська"},
-                        {"label": "Poltava", "value": "Полтавська"},
-                        {"label": "Rivne", "value": "Рівенська"},
-                        {"label": "Sumy", "value": "Сумська"},
-                        {"label": "Ternopil'", "value": "Тернопільська"},
-                        {"label": "Kharkiv", "value": "Харківська"},
-                        {"label": "Kherson", "value": "Херсонська"},
-                        {"label": "Khmel'nyts'kyy", "value": "Хмельницька"},
-                        {"label": "Cherkasy", "value": "Черкаська"},
-                        {"label": "Chernivtsi", "value": "Чернівецька"},
-                        {"label": "Chernihiv", "value": "Чернігівська"},
-                        {"label": "Crimea", "value": "Республіка Крим"}],
+            "options": [{"label": "Вінницька", "value": "Вінницька"},
+                        {"label": "Волинська", "value": "Волинська"},
+                        {"label": "Дніпропетровська", "value": "Дніпропетровська"},
+                        {"label": "Донецька", "value": "Донецька"},
+                        {"label": "Житомирська", "value": "Житомирська"},
+                        {"label": "Закарпатська", "value": "Закарпатська"},
+                        {"label": "Запорізька", "value": "Запорізька"},
+                        {"label": "Івано-Франківська", "value": "Івано-Франківська"},
+                        {"label": "Київська", "value": "Київська"},
+                        {"label": "Кіровоградська", "value": "Кіровоградська"},
+                        {"label": "Луганська", "value": "Луганська"},
+                        {"label": "Львівська", "value": "Львівська"},
+                        {"label": "Миколаївська", "value": "Миколаївська"},
+                        {"label": "Одеська", "value": "Одеська"},
+                        {"label": "Полтавська", "value": "Полтавська"},
+                        {"label": "Рівенська", "value": "Рівенська"},
+                        {"label": "Сумська", "value": "Сумська"},
+                        {"label": "Тернопільська", "value": "Тернопільська"},
+                        {"label": "Харківська", "value": "Харківська"},
+                        {"label": "Херсонська", "value": "Херсонська"},
+                        {"label": "Хмельницька", "value": "Хмельницька"},
+                        {"label": "Черкаська", "value": "Черкаська"},
+                        {"label": "Чернівецька", "value": "Чернівецька"},
+                        {"label": "Чернігівська", "value": "Чернігівська"},
+                        {"label": "Республіка Крим", "value": "Республіка Крим"}],
             "key": 'region',
             "action_id": "update_data"
         },
         {
-            "type": 'text',
-            "label": 'Year',
+
+            "type":'slider',
+            "label": 'year',
             "key": 'year',
-            "value": '',
-            "action_id": "update_data"
+            "value" : 2000,
+            "min" : 1999,
+            "max" : 2024,
+            "action_id" : "update_data",
         },
 
         {
@@ -60,7 +63,6 @@ class SetData(server.App):
             "label": 'Week min',
             "key": 'week_min',
             "value": '',
-            "min_value": 1,
             "action_id": "update_data"
         },
 
@@ -69,7 +71,6 @@ class SetData(server.App):
             "label": 'Week max',
             "key": 'week_max',
             "value": '',
-            "max_value": 52,
             "action_id": "update_data"
         }
     ]
@@ -110,6 +111,8 @@ class SetData(server.App):
         year = int(params['year'])
         week_min = int(params['week_min'])
         week_max = int(params['week_max'])
+        if week_max > 52:
+            return pd.DataFrame({'message': ['Будь ласка, введіть значення для Week max менше або рівне 52.']})
         if week_max < week_min:
             return pd.DataFrame({'message': ['Будь ласка, введіть правильні дані для Week min і Week max.']})
         data = df[(df['area'] == region) & (df['Year'] == year) & (df['Week'] >= week_min) & (df['Week'] <= week_max)]
