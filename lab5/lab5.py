@@ -93,6 +93,8 @@ def update(val):
         # Відфільтрований сигнал
         filtered_signal = butterworth_filter(signal_with_noise, fs, cutoff_freq)
         l_filtered.set_ydata(filtered_signal)
+        clean_signal = harmonic(t, amplitude, frequency, phase)
+        l_harmonic.set_ydata(clean_signal)
         l_harmonic.set_visible(True)
     else:
         # Чистий сигнал без шуму

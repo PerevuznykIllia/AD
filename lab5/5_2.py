@@ -47,6 +47,8 @@ app.layout = html.Div([
         dcc.Slider(id='noise-mean-slider', min=-1.0, max=1.0, step=0.1, value=initial_noise_mean),
         html.Label('Noise Covariance'),
         dcc.Slider(id='noise-covariance-slider', min=0.1, max=1.0, step=0.1, value=initial_noise_covariance),
+        html.Label('Window'),
+        dcc.Slider(id='window', min=1, max=100, step=1, value=10),
         html.Label('Show Noise'),
         dcc.Checklist(id='show-noise-checkbox', options=[{'label': 'Show Noise', 'value': 'show'}], value=['show']),
         html.Button('Reset', id='reset-button', n_clicks=0),
@@ -69,10 +71,11 @@ app.layout = html.Div([
         Input('phase-slider', 'value'),
         Input('noise-mean-slider', 'value'),
         Input('noise-covariance-slider', 'value'),
-        Input('show-noise-checkbox', 'value')
+        Input('show-noise-checkbox', 'value'),
+        Input('window', 'value')
     ]
 )
-def update_graph(amplitude, frequency, phase, noise_mean, noise_covariance, show_noise):
+def update_graph(amplitude, frequency, phase, noise_mean, noise_covariance, show_noise, window):
     global previous_noise, previous_noise_mean, previous_noise_covariance
     
     # Перевірка, чи параметри шуму змінилися
@@ -96,7 +99,7 @@ def update_graph(amplitude, frequency, phase, noise_mean, noise_covariance, show
         clean_signal = amplitude * np.sin(2 * np.pi * frequency * t + phase)
         fig.add_trace(go.Scatter(x=t, y=clean_signal, mode='lines', name='Clean Signal'))
         
-        filtered_noise = my_filter(previous_noise)
+        filtered_noise = my_filter(previous_noise, window)
         signal_with_filtered_noise = clean_signal + filtered_noise
         fig.add_trace(go.Scatter(x=t, y=signal_with_filtered_noise, mode='lines', name='Signal with Filtered Noise'))
     
@@ -110,7 +113,10 @@ def update_graph(amplitude, frequency, phase, noise_mean, noise_covariance, show
      Input('phase-slider', 'value'),
      Input('noise-mean-slider', 'value'),
      Input('noise-covariance-slider', 'value'),
-     Input('show-noise-checkbox', 'value')]
+     Input('show-noise-checkbox', 'value'),
+     Input('window', 'value')
+     ]
+    
 )
 def display_selected_graph(graph_type, amplitude, frequency, phase, noise_mean, noise_covariance, show_noise):
     if graph_type == 'clean-signal':
@@ -141,7 +147,7 @@ def generate_filtered_signal_graph(amplitude, frequency, phase, noise_mean, nois
 )
 def reset_sliders(n_clicks):
     if n_clicks > 0:
-        return initial_amplitude, initial_frequency, initial_phase, initial_noise_mean, initial_noise_covariance, ['show']
+        return initial_amplitude, initial_frequency, initial_phase, initial_noise_mean, initial_noise_covariance, ['show'],
     else:
         raise dash.exceptions.PreventUpdate
 
